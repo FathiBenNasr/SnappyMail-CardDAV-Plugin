@@ -50,6 +50,12 @@ SnappyMail itself, submitted upstream rather than carried here:
   so a failed or empty listing deleted contacts that still existed on the other
   side.
 
+## Authors
+
+* Original plugin — **Mailbux** ([mailbux.com](https://mailbux.com)), see `LICENSE`
+* Fork maintainer — **Fathi Ben Nasr** <fbennasr@convergent.tn>,
+  [Convergent Cloud Computing](https://www.convergent.tn)
+
 ## Credits and licence
 
 Original plugin © 2025 Mailbux — see `LICENSE`. This fork keeps that licence and
