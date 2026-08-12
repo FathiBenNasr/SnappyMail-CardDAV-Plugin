@@ -4,7 +4,7 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Mailbux CardDAV Auto',
-		VERSION  = '1.7',
+		VERSION  = '1.8',
 		RELEASE  = '2025-11-12',
 		CATEGORY = 'Contacts',
 		DESCRIPTION = 'Auto-configures CardDAV sync - switches per account',
