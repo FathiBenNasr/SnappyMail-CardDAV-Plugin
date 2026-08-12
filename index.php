@@ -1,6 +1,6 @@
 <?php
 
-class MailbuxCardDAVAutoPlugin extends \RainLoop\Plugins\AbstractPlugin
+class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Mailbux CardDAV Auto',
