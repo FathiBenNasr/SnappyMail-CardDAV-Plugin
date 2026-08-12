@@ -4,7 +4,7 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Mailbux CardDAV Auto',
-		VERSION  = '1.6',
+		VERSION  = '1.7',
 		RELEASE  = '2025-11-12',
 		CATEGORY = 'Contacts',
 		DESCRIPTION = 'Auto-configures CardDAV sync - switches per account',
@@ -18,15 +18,18 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 			\RainLoop\Plugins\Property::NewInstance('carddav_url_template')
 				->SetLabel('CardDAV URL template')
 				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
-				->SetDescription('Addressbook URL. {user} = mailbox name as the DAV server knows it,'
-					. ' {email} = full address, {login} = local part, {domain} = domain part.')
-				->SetDefaultValue('https://pim.convergent.cc/dav/addressbooks/user/{user}/Default'),
+				->SetDescription('Addressbook URL for this server, e.g.'
+					. ' https://dav.example.com/dav/addressbooks/user/{user}/Default'
+					. ' - {user} = mailbox name as the DAV server knows it, {email} = full address,'
+					. ' {login} = local part, {domain} = domain part. Leave empty to disable.')
+				->SetDefaultValue(''),
 			\RainLoop\Plugins\Property::NewInstance('dav_default_domain')
 				->SetLabel('DAV default domain')
 				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
-				->SetDescription('Cyrus virtdomains: addresses in this domain are addressed by local'
-					. ' part only, everything else by full address. Match imapd.conf defaultdomain.')
-				->SetDefaultValue('convergent.tn')
+				->SetDescription('Addresses in this domain are addressed by local part only,'
+					. ' everything else by full address. On Cyrus with "virtdomains: userid" this'
+					. ' is imapd.conf defaultdomain. Leave empty to always use the full address.')
+				->SetDefaultValue('')
 		);
 	}
 
@@ -39,8 +42,13 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 	 */
 	private function buildDavUrl(string $sEmail) : string
 	{
-		$sTemplate = \trim($this->Config()->Get('plugin', 'carddav_url_template', ''))
-			?: 'https://pim.convergent.cc/dav/addressbooks/user/{user}/Default';
+		// No built-in default: the URL belongs to the deployment, so it comes
+		// from the plugin's settings page and nowhere else. Empty means the
+		// admin has not configured it yet, and we refuse to invent one.
+		$sTemplate = \trim($this->Config()->Get('plugin', 'carddav_url_template', ''));
+		if (!\strlen($sTemplate)) {
+			return '';
+		}
 		$sDefaultDomain = \strtolower(\trim($this->Config()->Get('plugin', 'dav_default_domain', '')));
 
 		$aParts = \explode('@', $sEmail, 2);
@@ -114,6 +122,11 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 			// the caldav plugin, which derives its URL from this one, showed no
 			// events either.
 			$sCardDAVUrl = $this->buildDavUrl($sEmail);
+			if (!\strlen($sCardDAVUrl)) {
+				\SnappyMail\Log::notice('CardDAV',
+					'carddav_url_template is not set; leaving contacts_sync untouched');
+				return;
+			}
 			
 			// Get account credentials
 			$sPassword = null;
