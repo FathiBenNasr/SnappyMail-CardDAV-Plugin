@@ -1,3 +1,68 @@
+# SnappyMail CardDAV plugin — Cyrus IMAP / standards-compliant fork
+
+A fork of the **Mailbux CardDAV Auto** plugin for [SnappyMail](https://snappymail.eu),
+adapted so that it follows the CardDAV standards ([RFC 6352](https://www.rfc-editor.org/rfc/rfc6352))
+closely enough to work against **[Cyrus IMAP](https://www.cyrusimap.org/)**'s CardDAV
+implementation — and, by the same token, against any other standards-compliant
+CardDAV server.
+
+## What was changed and why
+
+**The server URL is configuration, not code.** Upstream hardcodes one hosting
+provider's host and rewrites the account's `contacts_sync` entry on every login,
+so contacts never reach any other server and a manual correction is silently
+overwritten at the next sign-in. The URL now comes from the plugin's own settings
+page, via a template with `{user}`, `{email}`, `{login}` and `{domain}`
+placeholders. There is no built-in default: with no template configured the
+plugin logs a notice and leaves `contacts_sync` untouched rather than writing a
+URL that cannot work.
+
+**Cyrus URL layout.** Cyrus serves `/dav/addressbooks/user/<user>/<collection>`,
+discoverable through the standard `addressbook-home-set` property. With
+`virtdomains: userid` a mailbox in the default domain is addressed by its local
+part and everything else by the full address, which the `{user}` placeholder and
+the default-domain setting handle.
+
+**A disabled sync stays disabled.** The auto-configuration hook runs on every
+login and unconditionally re-enabled two-way sync, overriding an administrator
+who had deliberately turned it off. That matters: a two-way sync against an
+addressbook that merely *looks* empty deletes local contacts. An existing
+`Mode: 0` is now preserved.
+
+## Configuration
+
+Admin → Plugins → carddav:
+
+| Setting | Example |
+| --- | --- |
+| CardDAV URL template | `https://dav.example.com/dav/addressbooks/user/{user}/Default/` |
+| DAV default domain | `example.com` — addresses in this domain use the local part only, matching Cyrus `virtdomains: userid`; leave empty to always use the full address |
+
+## Related upstream fixes
+
+Getting a two-way sync working against Cyrus also required two fixes in
+SnappyMail itself, submitted upstream rather than carried here:
+
+- HTTP drivers dropped associative request headers, so CardDAV uploads were sent
+  as `application/x-www-form-urlencoded` and refused with
+  `403 supported-address-data` — the sync silently behaved as import-only.
+- `PdoAddressBook::Sync()` treated an empty list on either side as authoritative,
+  so a failed or empty listing deleted contacts that still existed on the other
+  side.
+
+## Credits and licence
+
+Original plugin © 2025 Mailbux — see `LICENSE`. This fork keeps that licence and
+exists only to make the plugin work against standards-compliant CardDAV servers.
+
+---
+
+# Original plugin README
+
+Everything below is the upstream **Mailbux CardDAV Auto** README, kept
+verbatim. This fork does not change the plugin's origin or its authors'
+presentation of their service.
+
 ## ⚠️ Note
 
 > **Important:**  
