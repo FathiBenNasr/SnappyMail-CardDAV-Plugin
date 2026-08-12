@@ -4,13 +4,57 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Mailbux CardDAV Auto',
-		VERSION  = '1.5',
+		VERSION  = '1.6',
 		RELEASE  = '2025-11-12',
 		CATEGORY = 'Contacts',
 		DESCRIPTION = 'Auto-configures CardDAV sync - switches per account',
 		REQUIRED = '2.0.0';
 	
 	private $lastConfiguredEmail = null;
+
+	protected function configMapping() : array
+	{
+		return array(
+			\RainLoop\Plugins\Property::NewInstance('carddav_url_template')
+				->SetLabel('CardDAV URL template')
+				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetDescription('Addressbook URL. {user} = mailbox name as the DAV server knows it,'
+					. ' {email} = full address, {login} = local part, {domain} = domain part.')
+				->SetDefaultValue('https://pim.convergent.cc/dav/addressbooks/user/{user}/Default'),
+			\RainLoop\Plugins\Property::NewInstance('dav_default_domain')
+				->SetLabel('DAV default domain')
+				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetDescription('Cyrus virtdomains: addresses in this domain are addressed by local'
+					. ' part only, everything else by full address. Match imapd.conf defaultdomain.')
+				->SetDefaultValue('convergent.tn')
+		);
+	}
+
+	/**
+	 * Expand the configured template for one account.
+	 *
+	 * Cyrus runs "virtdomains: userid" with "defaultdomain: convergent.tn", so
+	 * /dav/addressbooks/user/fbennasr/ is right for convergent.tn while other
+	 * domains keep the full address in the path.
+	 */
+	private function buildDavUrl(string $sEmail) : string
+	{
+		$sTemplate = \trim($this->Config()->Get('plugin', 'carddav_url_template', ''))
+			?: 'https://pim.convergent.cc/dav/addressbooks/user/{user}/Default';
+		$sDefaultDomain = \strtolower(\trim($this->Config()->Get('plugin', 'dav_default_domain', '')));
+
+		$aParts = \explode('@', $sEmail, 2);
+		$sLogin = $aParts[0];
+		$sDomain = $aParts[1] ?? '';
+		$sUser = ($sDefaultDomain && \strtolower($sDomain) === $sDefaultDomain) ? $sLogin : $sEmail;
+
+		return \strtr($sTemplate, array(
+			'{user}'   => $sUser,
+			'{email}'  => $sEmail,
+			'{login}'  => $sLogin,
+			'{domain}' => $sDomain
+		));
+	}
 
 	public function Init() : void
 	{
@@ -64,8 +108,12 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 				return;
 			}
 
-			// Always update CardDAV to match current account email
-			$sCardDAVUrl = "https://my.mailbux.com/dav/card/{$sEmail}/default";
+			// Always update CardDAV to match current account email.
+			// Was hardcoded to another vendor's host (my.mailbux.com), which is
+			// not this server — CardDAV never reached the local Cyrus DAV and
+			// the caldav plugin, which derives its URL from this one, showed no
+			// events either.
+			$sCardDAVUrl = $this->buildDavUrl($sEmail);
 			
 			// Get account credentials
 			$sPassword = null;
@@ -111,9 +159,22 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 				$sPasswordHMAC = \hash_hmac('sha1', $sPassword, $sCryptKey);
 			}
 			
+			// Keep sync switched off if it was deliberately disabled: this
+			// plugin runs on every login and would otherwise silently re-arm a
+			// two-way sync that an admin turned off.
+			$iMode = 1;
+			$mExisting = $oStorageProvider->Get($oAccount,
+				\RainLoop\Providers\Storage\Enumerations\StorageType::CONFIG, 'contacts_sync');
+			if ($mExisting && \is_string($mExisting)) {
+				$aExisting = \json_decode($mExisting, true);
+				if (\is_array($aExisting) && isset($aExisting['Mode']) && !$aExisting['Mode']) {
+					$iMode = 0;
+				}
+			}
+
 			// Prepare CardDAV data
 			$aCardDAVData = [
-				'Mode' => 1,
+				'Mode' => $iMode,
 				'User' => $sEmail,
 				'Password' => $sPassword,
 				'PasswordHMAC' => $sPasswordHMAC,
