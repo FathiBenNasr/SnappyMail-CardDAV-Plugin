@@ -36,9 +36,10 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 	/**
 	 * Expand the configured template for one account.
 	 *
-	 * Cyrus runs "virtdomains: userid" with "defaultdomain: convergent.tn", so
-	 * /dav/addressbooks/user/fbennasr/ is right for convergent.tn while other
-	 * domains keep the full address in the path.
+	 * With Cyrus "virtdomains: userid" a mailbox in the configured default
+	 * domain is addressed by its local part, e.g.
+	 * /dav/addressbooks/user/<login>/, while every other domain keeps the
+	 * full address in the path.
 	 */
 	private function buildDavUrl(string $sEmail) : string
 	{
