@@ -12,6 +12,18 @@ class MailbuxCardDAVAutoPlugin extends \RainLoop\Plugins\AbstractPlugin
 	
 	private $lastConfiguredEmail = null;
 
+	protected function configMapping() : array
+	{
+		return array(
+			\RainLoop\Plugins\Property::NewInstance('carddav_url_template')
+				->SetLabel('CardDAV URL template')
+				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetDescription('Addressbook URL. {email} = full address, {login} = local part,'
+					. ' {domain} = domain part. The default targets Mailbux.')
+				->SetDefaultValue('https://my.mailbux.com/dav/card/{email}/default')
+		);
+	}
+
 	public function Init() : void
 	{
 		// Hook into login.success - runs for main login AND added accounts
@@ -65,7 +77,19 @@ class MailbuxCardDAVAutoPlugin extends \RainLoop\Plugins\AbstractPlugin
 			}
 
 			// Always update CardDAV to match current account email
-			$sCardDAVUrl = "https://my.mailbux.com/dav/card/{$sEmail}/default";
+			// The address book lives wherever the account is hosted, so the URL
+			// comes from the settings page. The default is unchanged, so a
+			// Mailbux account behaves exactly as before.
+			$aParts = \explode('@', $sEmail, 2);
+			$sCardDAVUrl = \strtr(
+				\trim($this->Config()->Get('plugin', 'carddav_url_template', ''))
+					?: 'https://my.mailbux.com/dav/card/{email}/default',
+				array(
+					'{email}'  => $sEmail,
+					'{login}'  => $aParts[0],
+					'{domain}' => $aParts[1] ?? ''
+				)
+			);
 			
 			// Get account credentials
 			$sPassword = null;
@@ -111,9 +135,23 @@ class MailbuxCardDAVAutoPlugin extends \RainLoop\Plugins\AbstractPlugin
 				$sPasswordHMAC = \hash_hmac('sha1', $sPassword, $sCryptKey);
 			}
 			
+			// Keep sync switched off if it was deliberately disabled. This hook
+			// runs on every login, so it otherwise re-arms a two-way sync an
+			// admin had turned off - and a two-way sync against an address book
+			// that merely looks empty deletes local contacts.
+			$iMode = 1;
+			$mExisting = $oStorageProvider->Get($oAccount,
+				\RainLoop\Providers\Storage\Enumerations\StorageType::CONFIG, 'contacts_sync');
+			if ($mExisting && \is_string($mExisting)) {
+				$aExisting = \json_decode($mExisting, true);
+				if (\is_array($aExisting) && isset($aExisting['Mode']) && !$aExisting['Mode']) {
+					$iMode = 0;
+				}
+			}
+
 			// Prepare CardDAV data
 			$aCardDAVData = [
-				'Mode' => 1,
+				'Mode' => $iMode,
 				'User' => $sEmail,
 				'Password' => $sPassword,
 				'PasswordHMAC' => $sPasswordHMAC,
