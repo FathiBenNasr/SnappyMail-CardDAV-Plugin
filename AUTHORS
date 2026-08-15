@@ -1,8 +1,14 @@
 Original plugin
 ---------------
 Mailbux — https://mailbux.com
-  SnappyMail CardDAV Auto, released 2025-11-12 under the terms in LICENSE.
+  SnappyMail CardDAV Auto, released 2025-11-12.
   Upstream repository: https://github.com/mailwish/SnappyMail-CardDAV-Plugin
+
+  Upstream published this plugin without a licence file, and this fork does
+  not add one: the terms are the original author's to set, not ours. The
+  copyright in the original code remains with Mailbux. Anyone wanting to
+  redistribute it should ask them. (The companion CalDAV plugin was released
+  under MIT; that grant does not extend to this one.)
 
 Fork maintainer
 ---------------
