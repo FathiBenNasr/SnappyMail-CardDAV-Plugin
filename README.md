@@ -29,6 +29,25 @@ who had deliberately turned it off. That matters: a two-way sync against an
 addressbook that merely *looks* empty deletes local contacts. An existing
 `Mode: 0` is now preserved.
 
+```mermaid
+flowchart TD
+    L([Sign-in]) --> H[auto-configuration hook]
+    H --> T{URL template<br/>configured?}
+    T -- no --> LEAVE["log a notice and leave<br/><code>contacts_sync</code> **untouched** —<br/>upstream wrote a hardcoded host here"]:::amber
+    T -- yes --> SUB["substitute {user} {email}<br/>{login} {domain}"]
+    SUB --> M{"existing <code>Mode: 0</code>?"}
+    M -- yes --> KEEP["leave it disabled — upstream<br/>re-enabled two-way sync on **every**<br/>login, overriding the administrator"]:::amber
+    M -- no --> W[write contacts_sync]:::green
+    KEEP -.->|"why it matters"| RISK["a two-way sync against an addressbook<br/>that merely *looks* empty<br/>deletes local contacts"]:::red
+    classDef green fill:#e6f4ea,stroke:#34a853
+    classDef amber fill:#fef7e0,stroke:#f9ab00
+    classDef red fill:#fce8e6,stroke:#ea8600
+```
+
+Both amber boxes are the fork. Upstream took neither branch: it rewrote
+`contacts_sync` on every sign-in with one hosting provider's host, and it
+re-armed a sync somebody had deliberately switched off.
+
 ## Configuration
 
 Admin → Plugins → carddav:
