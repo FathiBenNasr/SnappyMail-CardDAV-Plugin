@@ -1,13 +1,15 @@
 Original plugin
 ---------------
-Mailbux — https://mailbux.com
+Published by Mailwish — https://mailwish.com (GitHub org `mailwish`)
+Branded Mailbux — https://mailbux.com (the repository's homepage field)
   SnappyMail CardDAV Auto, released 2025-11-12.
   Upstream repository: https://github.com/mailwish/SnappyMail-CardDAV-Plugin
 
   Upstream published this plugin without a licence file, and this fork does
   not add one: the terms are the original author's to set, not ours. The
-  copyright in the original code remains with Mailbux. Anyone wanting to
-  redistribute it should ask them. (The companion CalDAV plugin was released
+  copyright in the original code is not ours — see the note at the end on
+  which of the two names holds it. Anyone wanting to redistribute it should
+  ask them. (The companion CalDAV plugin was released
   under MIT; that grant does not extend to this one.)
 
 Fork maintainer
@@ -17,3 +19,29 @@ Fathi Ben Nasr <fbennasr@convergent.tn>
   Adaptations for standards compliance and interoperability with the
   Cyrus IMAP CardDAV implementation. See the commit history and README
   for the specific changes.
+
+A note on the two names
+-----------------------
+The repository that published this plugin belongs to the **Mailwish** GitHub
+organisation; its homepage field, its plugin name and its hardcoded service
+host all say **Mailbux**. Both names are recorded here because both appear in
+the original, and it is not ours to decide which one is the legal author.
+
+On 15 August 2026 we wrote to support@mailbux.com about the missing licence and
+our open pull requests (ticket #5577). Mailbux replied on 26 August:
+
+    "Thank you for the kind words — but we think you may have the wrong
+     maintainer. We do not publish or maintain SnappyMail plugins; our webmail
+     work is based on a different stack, and we have no SnappyMail repositories.
+     If you can send us the link to the repository where you found the plugins,
+     we will gladly take a look and confirm either way."
+
+The public contact of the organisation that holds the repositories is
+support@mailwish.com, and that is where the question has been put next.
+
+Until someone with authority states otherwise, nothing changes here: no licence
+is added, the copyright is not ours, and anyone wanting to redistribute this
+plugin should ask the original author. The plugin's entry in the SnappyMail
+administration panel says so too, rather than inheriting the "AGPL v3" that
+AbstractPlugin fills in by default — which would have claimed a grant nobody
+ever made.

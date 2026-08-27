@@ -4,9 +4,12 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'Mailbux CardDAV Auto',
-		VERSION  = '1.8',
+		AUTHOR   = 'Mailwish / Mailbux — fork maintained by Convergent Cloud Computing',
+		URL      = 'https://git.convergent.tn/fbennasr/snappymail-plugin-carddav',
+		VERSION  = '1.9',
 		RELEASE  = '2025-11-12',
 		CATEGORY = 'Contacts',
+		LICENSE  = 'No licence stated by the original author — see AUTHORS',
 		DESCRIPTION = 'Auto-configures CardDAV sync - switches per account',
 		REQUIRED = '2.0.0';
 	
