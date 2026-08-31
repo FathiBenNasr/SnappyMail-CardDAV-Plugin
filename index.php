@@ -5,7 +5,7 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 	const
 		NAME     = 'Mailbux CardDAV Auto',
 		AUTHOR   = 'Mailwish / Mailbux — fork maintained by Convergent Cloud Computing',
-		URL      = 'https://git.convergent.tn/fbennasr/snappymail-plugin-carddav',
+		URL      = 'https://git.convergent.tn/fbennasr/SnappyMail-carddav',
 		VERSION  = '1.9',
 		RELEASE  = '2025-11-12',
 		CATEGORY = 'Contacts',
