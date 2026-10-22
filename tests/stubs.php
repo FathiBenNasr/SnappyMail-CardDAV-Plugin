@@ -93,6 +93,20 @@ namespace RainLoop\Exceptions {
     }
 }
 
+namespace RainLoop {
+    /** `Api::Config()` du cœur : la seule clé lue, `admin_panel.language`. */
+    class Api
+    {
+        public static string $langueAdmin = 'en';
+        public static function Config(): object
+        {
+            return new class {
+                public function Get(string $s, string $k, $d = null) { return 'admin_panel' === $s && 'language' === $k ? \RainLoop\Api::$langueAdmin : $d; }
+            };
+        }
+    }
+}
+
 namespace RainLoop\Enumerations {
     class PluginPropertyType { const BOOL = 1; const STRING = 2; const INT = 3; }
 }
@@ -103,8 +117,10 @@ namespace RainLoop\Plugins {
         private array $data = [];
         public function __construct(public string $name) {}
         public static function NewInstance(string $name): self { return new self($name); }
-        public function SetLabel(string $v): self { $this->data['label'] = $v; return $this; }
-        public function SetDescription(string $v): self { $this->data['desc'] = $v; return $this; }
+        public string $label = '';
+        public string $desc = '';
+        public function SetLabel(string $v): self { $this->label = $v; return $this; }
+        public function SetDescription(string $v): self { $this->desc = $v; return $this; }
         public function SetType(int $v): self { $this->data['type'] = $v; return $this; }
         public function SetDefaultValue($v): self { $this->data['default'] = $v; return $this; }
         public function GetDefaultValue() { return $this->data['default'] ?? null; }

@@ -1,0 +1,12 @@
+{
+	"REGLAGES": {
+		"carddav_url_template": {
+			"label": "قالب عنوان CardDAV",
+			"desc": "عنوان دفتر العناوين على هذا الخادم، مثال: https://dav.example.com/dav/addressbooks/user/{user}/Default - {user} = اسم صندوق البريد كما يعرفه خادم DAV، {email} = العنوان الكامل، {login} = الجزء المحلي، {domain} = جزء النطاق. اتركه فارغًا للتعطيل."
+		},
+		"dav_default_domain": {
+			"label": "نطاق DAV الافتراضي",
+			"desc": "عناوين هذا النطاق تستخدم جزءها المحلي فقط، وكل ما عداها يستخدم العنوان الكامل. على Cyrus مع «virtdomains: userid» هو defaultdomain في imapd.conf. اتركه فارغًا لاستخدام العنوان الكامل دائمًا."
+		}
+	}
+}

@@ -1,0 +1,12 @@
+{
+	"REGLAGES": {
+		"carddav_url_template": {
+			"label": "Gabarit d'adresse CardDAV",
+			"desc": "Adresse du carnet d'adresses sur ce serveur, par exemple https://dav.example.com/dav/addressbooks/user/{user}/Default - {user} = nom de la boîte tel que le serveur DAV le connaît, {email} = adresse complète, {login} = partie locale, {domain} = partie domaine. Laisser vide pour désactiver."
+		},
+		"dav_default_domain": {
+			"label": "Domaine DAV par défaut",
+			"desc": "Les adresses de ce domaine n'utilisent que leur partie locale, toutes les autres leur adresse complète. Sur Cyrus avec « virtdomains: userid », c'est le defaultdomain de imapd.conf. Laisser vide pour toujours utiliser l'adresse complète."
+		}
+	}
+}

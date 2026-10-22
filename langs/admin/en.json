@@ -1,0 +1,12 @@
+{
+	"REGLAGES": {
+		"carddav_url_template": {
+			"label": "CardDAV URL template",
+			"desc": "Addressbook URL for this server, e.g. https://dav.example.com/dav/addressbooks/user/{user}/Default - {user} = mailbox name as the DAV server knows it, {email} = full address, {login} = local part, {domain} = domain part. Leave empty to disable."
+		},
+		"dav_default_domain": {
+			"label": "DAV default domain",
+			"desc": "Addresses in this domain are addressed by local part only, everything else by full address. On Cyrus with \"virtdomains: userid\" this is imapd.conf defaultdomain. Leave empty to always use the full address."
+		}
+	}
+}

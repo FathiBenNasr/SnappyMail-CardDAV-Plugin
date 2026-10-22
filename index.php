@@ -6,7 +6,7 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 		NAME     = 'Mailbux CardDAV Auto',
 		AUTHOR   = 'Mailwish / Mailbux — fork maintained by Convergent Cloud Computing',
 		URL      = 'https://git.convergent.tn/fbennasr/SnappyMail-carddav',
-		VERSION  = '1.9',
+		VERSION  = '1.9.1',
 		RELEASE  = '2025-11-12',
 		CATEGORY = 'Contacts',
 		LICENSE  = 'No licence stated by the original author — see AUTHORS',
@@ -15,23 +15,113 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 	
 	private $lastConfiguredEmail = null;
 
-	protected function configMapping() : array
+	/**
+	 * Un réglage d'administration, libellé et description dans la langue du
+	 * navigateur de l'administrateur (`langs/admin/{en,fr}.json`, section
+	 * `REGLAGES`).
+	 *
+	 * Le cœur affiche `label` et `desc` tels quels, sans passer par i18n : la
+	 * traduction se fait donc ici. Elle vit hors de `langs/<langue>.json`, que
+	 * `ReadLang()` verse dans le paquet de **chaque** utilisateur. La langue est
+	 * lue dans `Accept-Language`, pas par `GetLanguage()` : `configMapping()` est
+	 * appelé pendant la construction du gestionnaire de greffons, que
+	 * `GetLanguage()` rappelle par son accroche `filter.language`.
+	 */
+	private static function reglage(string $sNom) : \RainLoop\Plugins\Property
+	{
+		static $aCache = array();
+		$sLang = self::langueAdmin();
+		foreach (\array_unique(array($sLang, 'en')) as $sEssai) {
+			if (!isset($aCache[$sEssai])) {
+				$sFichier = __DIR__ . '/langs/admin/' . $sEssai . '.json';
+				$aData = \is_readable($sFichier) ? \json_decode((string) \file_get_contents($sFichier), true) : null;
+				$aCache[$sEssai] = \is_array($aData['REGLAGES'] ?? null) ? $aData['REGLAGES'] : array();
+			}
+			if (isset($aCache[$sEssai][$sNom]['label'])) {
+				return \RainLoop\Plugins\Property::NewInstance($sNom)
+					->SetLabel((string) $aCache[$sEssai][$sNom]['label'])
+					->SetDescription((string) ($aCache[$sEssai][$sNom]['desc'] ?? ''));
+			}
+		}
+		return \RainLoop\Plugins\Property::NewInstance($sNom)->SetLabel($sNom);
+	}
+
+	/**
+	 * La langue des réglages d'administration. Règle du propriétaire,
+	 * 22 octobre 2026 : *proposer* la langue du navigateur, mais **garder le
+	 * choix explicite** même s'il en diffère ; le français par défaut si le
+	 * client ne choisit pas l'anglais.
+	 *
+	 * Le choix explicite est `admin_panel.language`, **seulement** si quelqu'un
+	 * l'a posé dans le panneau (Général → langue) : le fichier fourni porte `en`
+	 * sans que personne l'ait choisi, et la configuration seule ne distingue
+	 * pas les deux. `NoteLangueAdmin()` pose donc une marque quand le panneau
+	 * l'enregistre. Sans marque : `Accept-Language`, ordre des `q`, la première
+	 * préférence `en` ou `fr` gagne, sinon le français. L'arabe n'est pas
+	 * proposé : le panneau de SnappyMail 2.38.2 ne l'offre pas.
+	 */
+	protected static function langueAdmin() : string
+	{
+		if (\is_file(self::marqueLangueAdmin())) {
+			try {
+				$sChoix = (string) \RainLoop\Api::Config()->Get('admin_panel', 'language', '');
+				return 0 === \strncasecmp($sChoix, 'en', 2) ? 'en' : 'fr';
+			} catch (\Throwable $e) {
+				// configuration illisible : on retombe sur le navigateur
+			}
+		}
+		$sEntete = \strtolower(\substr((string) ($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? ''), 0, 512));
+		$aPrefs = array();
+		foreach (\explode(',', $sEntete) as $iRang => $sPart) {
+			if (\preg_match('/^\s*([a-z]{1,8})(?:-[a-z0-9]{1,8})*\s*(?:;\s*q\s*=\s*([01](?:\.\d{0,3})?))?\s*$/D', $sPart, $m)) {
+				$fQ = isset($m[2]) && '' !== $m[2] ? (float) $m[2] : 1.0;
+				if (0 < $fQ) {
+					$aPrefs[] = array($fQ, $iRang, $m[1]);
+				}
+			}
+		}
+		\usort($aPrefs, fn ($a, $b) => $b[0] <=> $a[0] ?: $a[1] <=> $b[1]);
+		foreach ($aPrefs as $a) {
+			if ('en' === $a[2] || 'fr' === $a[2]) {
+				return $a[2];
+			}
+		}
+		return 'fr';
+	}
+
+	/** Partagée par tous les greffons de la suite : le même nom, la même règle. */
+	protected static function marqueLangueAdmin() : string
+	{
+		return (\defined('APP_PRIVATE_DATA') ? APP_PRIVATE_DATA : \sys_get_temp_dir() . '/') . 'convergent-langue-admin-choisie';
+	}
+
+	/**
+	 * `json.after-AdminSettingsUpdate` : le panneau vient d'enregistrer ses
+	 * réglages. Le cœur a déjà exigé la session d'administrateur
+	 * (`IsAdminLoggined()` lève sinon, et cette accroche ne court pas) ; on
+	 * exige en plus une réponse réussie et un `languageAdmin` envoyé — tout
+	 * autre réglage enregistré ne vaut pas choix de langue.
+	 */
+	public function NoteLangueAdmin(&$aResponse) : void
+	{
+		if (!\is_array($aResponse) || true !== ($aResponse['Result'] ?? null)) {
+			return;
+		}
+		$sLang = (string) $this->Manager()->Actions()->GetActionParam('languageAdmin', '');
+		if ('' === $sLang) {
+			return;
+		}
+		@\file_put_contents(self::marqueLangueAdmin(), \gmdate('c') . "\n", LOCK_EX);
+	}
+
+		protected function configMapping() : array
 	{
 		return array(
-			\RainLoop\Plugins\Property::NewInstance('carddav_url_template')
-				->SetLabel('CardDAV URL template')
+			self::reglage('carddav_url_template')
 				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
-				->SetDescription('Addressbook URL for this server, e.g.'
-					. ' https://dav.example.com/dav/addressbooks/user/{user}/Default'
-					. ' - {user} = mailbox name as the DAV server knows it, {email} = full address,'
-					. ' {login} = local part, {domain} = domain part. Leave empty to disable.')
 				->SetDefaultValue(''),
-			\RainLoop\Plugins\Property::NewInstance('dav_default_domain')
-				->SetLabel('DAV default domain')
+			self::reglage('dav_default_domain')
 				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
-				->SetDescription('Addresses in this domain are addressed by local part only,'
-					. ' everything else by full address. On Cyrus with "virtdomains: userid" this'
-					. ' is imapd.conf defaultdomain. Leave empty to always use the full address.')
 				->SetDefaultValue('')
 		);
 	}
@@ -70,6 +160,7 @@ class CarddavPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function Init() : void
 	{
+		$this->addHook('json.after-AdminSettingsUpdate', 'NoteLangueAdmin');
 		// Hook into login.success - runs for main login AND added accounts
 		$this->addHook('login.success', 'AutoConfigureCardDAV');
 		
