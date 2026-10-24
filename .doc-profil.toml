@@ -1,0 +1,9 @@
+# Profil de documentation, lu par audit_doc.py (dépôt convergent-modele-doc).
+
+profil = "greffon"
+parent = "snappymail"
+interface = false
+modele_donnees = false
+licence = "NOASSERTION"
+amont = "https://github.com/mailwish/SnappyMail-CardDAV-Plugin"
+licence_motif = "l'auteur d'origine n'a publié aucune licence ; ce fork n'en ajoute pas (voir AUTHORS)"

@@ -1,181 +1,119 @@
-# SnappyMail CardDAV plugin — Cyrus IMAP / standards-compliant fork
+# SnappyMail-carddav — un CardDAV qui parle à n'importe quel serveur conforme
 
-A fork of the **Mailbux CardDAV Auto** plugin for [SnappyMail](https://snappymail.eu),
-adapted so that it follows the CardDAV standards ([RFC 6352](https://www.rfc-editor.org/rfc/rfc6352))
-closely enough to work against **[Cyrus IMAP](https://www.cyrusimap.org/)**'s CardDAV
-implementation — and, by the same token, against any other standards-compliant
-CardDAV server.
+**Français** · [English](README.en.md)
 
-## What was changed and why
+> Fork du greffon **CardDAV Auto** de Mailwish / Mailbux pour [SnappyMail](https://snappymail.eu),
+> adapté pour suivre les normes CardDAV ([RFC 6352](https://www.rfc-editor.org/rfc/rfc6352)) d'assez
+> près pour fonctionner avec l'implantation CardDAV de **Cyrus IMAP** — et, du même coup, avec tout
+> serveur conforme. À la connexion, il configure la synchronisation du carnet d'adresses de la
+> personne.
 
-**The server URL is configuration, not code.** Upstream hardcodes one hosting
-provider's host and rewrites the account's `contacts_sync` entry on every login,
-so contacts never reach any other server and a manual correction is silently
-overwritten at the next sign-in. The URL now comes from the plugin's own settings
-page, via a template with `{user}`, `{email}`, `{login}` and `{domain}`
-placeholders. There is no built-in default: with no template configured the
-plugin logs a notice and leaves `contacts_sync` untouched rather than writing a
-URL that cannot work.
+| | |
+|---|---|
+| Version | 1.9.1 (22 octobre 2026, non déployée) |
+| Profil | greffon SnappyMail sans écran utilisateur, dossier déployé `carddav` |
+| Logiciel parent | SnappyMail 2.38.x ; greffon CalDAV compagnon |
+| Licence | **aucune accordée** par l'auteur d'origine — voir [AUTHORS](AUTHORS) |
+| Dépôt de référence | `git.convergent.tn/fbennasr/SnappyMail-carddav`, miroité sur GitHub |
 
-**Cyrus URL layout.** Cyrus serves `/dav/addressbooks/user/<user>/<collection>`,
-discoverable through the standard `addressbook-home-set` property. With
-`virtdomains: userid` a mailbox in the default domain is addressed by its local
-part and everything else by the full address, which the `{user}` placeholder and
-the default-domain setting handle.
+## Fonctionnalités
 
-**A disabled sync stays disabled.** The auto-configuration hook runs on every
-login and unconditionally re-enabled two-way sync, overriding an administrator
-who had deliberately turned it off. That matters: a two-way sync against an
-addressbook that merely *looks* empty deletes local contacts. An existing
-`Mode: 0` is now preserved.
+- **L'URL du serveur est un réglage, plus du code.** L'amont écrivait en dur l'hôte d'un hébergeur
+  et réécrivait `contacts_sync` à chaque connexion. L'URL vient désormais d'un gabarit réglable,
+  avec `{user}`, `{email}`, `{login}` et `{domain}`. Sans gabarit, le greffon journalise et ne
+  touche à rien.
+- **Disposition des URL de Cyrus** : `/dav/addressbooks/user/<utilisateur>/<collection>` ; avec
+  `virtdomains: userid`, une boîte du domaine par défaut est désignée par sa partie locale.
+- **Une synchronisation désactivée reste désactivée.** L'amont la réarmait à chaque connexion ;
+  or une synchronisation bidirectionnelle contre un carnet qui *paraît* vide efface les contacts
+  locaux. Un `Mode: 0` existant est conservé.
 
-```mermaid
-flowchart TD
-    L([Sign-in]) --> H[auto-configuration hook]
-    H --> T{URL template<br/>configured?}
-    T -- no --> LEAVE["log a notice and leave<br/><code>contacts_sync</code> **untouched** —<br/>upstream wrote a hardcoded host here"]:::amber
-    T -- yes --> SUB["substitute {user} {email}<br/>{login} {domain}"]
-    SUB --> M{"existing <code>Mode: 0</code>?"}
-    M -- yes --> KEEP["leave it disabled — upstream<br/>re-enabled two-way sync on **every**<br/>login, overriding the administrator"]:::amber
-    M -- no --> W[write contacts_sync]:::green
-    KEEP -.->|"why it matters"| RISK["a two-way sync against an addressbook<br/>that merely *looks* empty<br/>deletes local contacts"]:::red
-    classDef green fill:#e6f4ea,stroke:#34a853
-    classDef amber fill:#fef7e0,stroke:#f9ab00
-    classDef red fill:#fce8e6,stroke:#ea8600
-```
+## Prérequis
 
-Both amber boxes are the fork. Upstream took neither branch: it rewrote
-`contacts_sync` on every sign-in with one hosting provider's host, and it
-re-armed a sync somebody had deliberately switched off.
+| Composant | Version | Remarque |
+|---|---|---|
+| SnappyMail | 2.38.x | accroche de configuration à la connexion |
+| Serveur CardDAV | conforme à la RFC 6352 | éprouvé avec Cyrus IMAP |
+| Greffon CalDAV compagnon | — | requis par l'amont pour la logique partagée |
+
+## Installation
+
+Copier `index.php`, `update-carddav.js` et `langs/` dans le dossier `carddav` des greffons de
+SnappyMail, appliquer l'étiquette SELinux si elle s'applique, puis activer le greffon dans le
+panneau d'administration. Détail : [docs/ADMINISTRATION.md](docs/ADMINISTRATION.md#installation).
 
 ## Configuration
 
-Admin → Plugins → carddav:
+| Option | Défaut | Effet |
+|---|---|---|
+| Gabarit d'URL CardDAV | vide | par exemple `https://dav.example.com/dav/addressbooks/user/{user}/Default/` ; vide, rien n'est écrit |
+| Domaine DAV par défaut | vide | les adresses de ce domaine n'utilisent que leur partie locale (Cyrus `virtdomains: userid`) |
 
-| Setting | Example |
-| --- | --- |
-| CardDAV URL template | `https://dav.example.com/dav/addressbooks/user/{user}/Default/` |
-| DAV default domain | `example.com` — addresses in this domain use the local part only, matching Cyrus `virtdomains: userid`; leave empty to always use the full address |
+Référence : [docs/ADMINISTRATION.md](docs/ADMINISTRATION.md#configuration).
 
-## Related upstream fixes
+## Utilisation
 
-Getting a two-way sync working against Cyrus also required two fixes in
-SnappyMail itself, submitted upstream rather than carried here:
+Rien à faire côté utilisateur : à la connexion, la synchronisation des contacts est configurée vers
+le carnet de la personne. Une synchronisation qu'un administrateur a éteinte le reste.
 
-- HTTP drivers dropped associative request headers, so CardDAV uploads were sent
-  as `application/x-www-form-urlencoded` and refused with
-  `403 supported-address-data` — the sync silently behaved as import-only.
-- `PdoAddressBook::Sync()` treated an empty list on either side as authoritative,
-  so a failed or empty listing deleted contacts that still existed on the other
-  side.
+## Architecture
 
-## Authors
+```mermaid
+flowchart TD
+    L([Connexion]) --> H[accroche de configuration]
+    H --> T{Gabarit d'URL<br/>réglé ?}
+    T -- non --> LAISSE[journaliser et laisser<br/>contacts_sync intact]
+    T -- oui --> SUB[substituer user, email,<br/>login, domain]
+    SUB --> M{Mode 0 existant ?}
+    M -- oui --> GARDE[la laisser désactivée]
+    M -- non --> W[écrire contacts_sync]
+```
 
-* Original plugin — **Mailbux** ([mailbux.com](https://mailbux.com)), see `LICENSE`
-* Fork maintainer — **Fathi Ben Nasr** <fbennasr@convergent.tn>,
-  [Convergent Cloud Computing](https://www.convergent.tn)
+Détail, et les correctifs envoyés à l'amont de SnappyMail : [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Credits and licence
+## Sécurité
 
-Original plugin © 2025 Mailbux — see `LICENSE`. This fork keeps that licence and
-exists only to make the plugin work against standards-compliant CardDAV servers.
+Le greffon n'écrit plus d'hôte tiers en dur, ne réarme jamais une synchronisation désactivée et ne
+détient aucun secret : la synchronisation utilise les identifiants de la session. Détail :
+[docs/SECURITE.md](docs/SECURITE.md). Signaler une vulnérabilité : [SECURITY.md](SECURITY.md).
 
----
+## Tests
 
-# Original plugin README
+```sh
+php tests/run.php            # 14 contrôles : gabarit d'URL, réglages traduits
+```
 
-Everything below is the upstream **Mailbux CardDAV Auto** README, kept
-verbatim. This fork does not change the plugin's origin or its authors'
-presentation of their service.
+## Dépannage
 
-## ⚠️ Note
+| Symptôme | Cause probable | Remède |
+|---|---|---|
+| Les contacts ne se synchronisent pas | gabarit d'URL vide | le régler dans le panneau |
+| La synchronisation ne fait qu'importer | défaut d'en-têtes HTTP du cœur, corrigé en amont | version de SnappyMail portant le correctif |
+| Des contacts locaux ont disparu | synchronisation bidirectionnelle contre un carnet vide | garder `Mode: 0` tant que le serveur n'est pas vérifié |
 
-> **Important:**  
-> This plugin **must be installed together with the [SnappyMail CalDAV Plugin](https://github.com/mailwish/SnappyMail-CalDAV-Plugin)** for full synchronization support.  
-> The CalDAV plugin provides shared logic used by both calendar and contact synchronization modules.
+Plus de cas : [docs/ADMINISTRATION.md](docs/ADMINISTRATION.md#dépannage).
 
-# 👥 SnappyMail CardDAV Plugin
+## Documentation
 
-A lightweight and modern **CardDAV integration** for [SnappyMail](https://snappymail.eu), proudly created by [**Mailbux.com**](https://mailbux.com) — the all-in-one **free business email hosting** platform.
+| Document | Pour qui |
+|---|---|
+| [Administration](docs/ADMINISTRATION.md) · [English](docs/ADMINISTRATION.en.md) | administrateurs |
+| [Architecture](docs/ARCHITECTURE.md) | développeurs |
+| [Sécurité](docs/SECURITE.md) | responsable sécurité |
+| [Décisions d'architecture](docs/adr/) | développeurs |
+| [README d'origine, tel quel](docs/README-amont.md) | tous |
+| [Auteurs et licence](AUTHORS) | tous |
 
-![SnappyMail CalDAV Plugin](https://mailwish.com/wp-content/uploads/2025/04/logo240.png)
----
+## Historique
 
-## ✨ Description
+Les changements de chaque version : [CHANGELOG.md](CHANGELOG.md).
 
-The **SnappyMail CardDAV Plugin** enables automatic synchronization of contacts with any CardDAV server.  
-It seamlessly connects SnappyMail’s address book to your remote contact source — including instant sync with [**Mailbux.com**](https://mailbux.com) address books.
+## Licence
 
-This plugin intelligently detects and **auto-switches to remote CardDAV sync** when available, ensuring your contacts always stay up to date across all devices.
+Aucune licence n'a été publiée par l'auteur d'origine, et ce fork n'en ajoute pas : les termes lui
+appartiennent. Le droit d'auteur du code d'origine n'est pas le nôtre ; quiconque veut le
+redistribuer doit le lui demander. Voir [AUTHORS](AUTHORS).
 
----
+## Auteur
 
-## 🚀 Features
-
-- 👥 Sync contacts automatically via CardDAV  
-- 🔄 **Auto-detect & switch** to remote CardDAV servers  
-- 🔒 Secure encrypted sync (HTTPS/TLS)  
-- ⚙️ Simple setup in SnappyMail settings  
-- 📨 Fully compatible with [Mailbux.com](https://mailbux.com) accounts  
-- 📱 Works with any CardDAV-compatible client or mobile app  
-
----
-
-## 🛠️ Installation
-
-1. Download or clone this repository.  
-2. Copy the plugin folder into your SnappyMail `/plugins/` directory.  
-3. Enable the plugin from the **SnappyMail Admin Panel**.  
-4. Configure your CardDAV server details (Mailbux or other).  
-
-> ✅ Once configured, SnappyMail will automatically connect and sync contacts in the background.
-
----
-
-## 💡 About Mailbux
-
-[**Mailbux.com**](https://mailbux.com) provides **unlimited, free business email hosting** — professional email at your domain, with built-in CalDAV, CardDAV, and WebDAV support for full productivity.
-
-### 🌟 Why Choose Mailbux
-
-| Feature | Mailbux.com | Google Workspace | Microsoft 365 |
-|----------|--------------|------------------|----------------|
-| Price | **Free** | $6/user/mo | $6/user/mo |
-| Email Accounts | **Unlimited** | 1 per user | 1 per user |
-| Domains | **Unlimited** | Limited | Limited |
-| Contacts & Calendar Sync (DAV) | ✅ | ✅ | ✅ |
-| Custom Branding | ✅ | ❌ | ❌ |
-| SMTP Relay | ✅ | ✅ | ✅ |
-
-### Highlights
-- 💌 **Unlimited business email hosting**  
-- 🌐 **CardDAV, CalDAV, and WebDAV** for contacts, calendars, and files  
-- ⚙️ **Admin dashboard** with API access  
-- 🧩 **White-label & rebranding** options for resellers  
-- 🔐 **Ad-free, privacy-focused platform**  
-
-> 💬 “Mailbux lets me manage all my business contacts and calendars in one place — completely free.”
-
----
-
-## 📷 Screenshots
-
-*(Optional: Add plugin or contact sync screenshots here)*
-
----
-
-## 🌐 Learn More
-
-👉 [**Mailbux.com**](https://mailbux.com) — Create your **free business email account** today.  
-Unlimited mailboxes, custom domains, and integrated contact & calendar sync — all at no cost.
-
----
-
-## 🧑‍💻 Author
-
-**Developed by [Mailbux.com](https://mailbux.com)**  
-📧 Support: [support@mailbux.com](mailto:support@mailbux.com)
-
----
-
-© 2025 Mailbux.com — Powered by [CloudWish LLC](https://cloudwish.com)
+Greffon d'origine : Mailwish / Mailbux. Fork : Convergent Cloud Computing — contact@convergent.tn
