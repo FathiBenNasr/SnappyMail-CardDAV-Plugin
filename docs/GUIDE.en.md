@@ -48,8 +48,8 @@ contacts start with it; **All** shows them all.
 
 **Result:** the contact appears in the list, under its letter.
 
-To add the sender of a message you are reading, there is a quicker way: see the guide "Add the sender to
-your contacts".
+To add the sender of a message you are reading, there is a quicker way: see
+["Add the sender to contacts"](https://git.convergent.tn/fbennasr/SnappyMail-ajouter-contact/src/branch/main/docs/GUIDE.en.md#add-the-sender-to-contacts).
 
 ## Write to one or more contacts
 
@@ -82,7 +82,7 @@ the file.
 ## Frequently asked questions
 
 **Do my contacts show up on my phone?**
-Yes, if your phone is linked to your account (see the guide "Set up your phone"). The address book is the
+Yes, if your phone is linked to your account (see ["Add your account on a phone"](https://git.convergent.tn/fbennasr/SnappyMail-workspace/src/branch/main/autoconfig/docs/GUIDE.en.md#add-your-account-on-a-phone)). The address book is the
 same everywhere.
 
 **A contact cannot be edited.**

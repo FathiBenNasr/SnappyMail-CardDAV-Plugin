@@ -48,8 +48,8 @@ combien de contacts commencent par elle ; **Tous** les montre tous.
 
 **Résultat :** le contact apparaît dans la liste, à sa lettre.
 
-Pour ajouter l'expéditeur d'un message que vous lisez, il y a plus court : voir le guide « Ajouter
-l'expéditeur aux contacts ».
+Pour ajouter l'expéditeur d'un message que vous lisez, il y a plus court : voir
+[« Ajouter l'expéditeur aux contacts »](https://git.convergent.tn/fbennasr/SnappyMail-ajouter-contact/src/branch/main/docs/GUIDE.md#ajouter-lexpéditeur-aux-contacts).
 
 ## Écrire à un ou plusieurs contacts
 
@@ -83,7 +83,7 @@ télécharge le fichier.
 ## Questions fréquentes
 
 **Mes contacts apparaissent-ils sur mon téléphone ?**
-Oui, si votre téléphone est relié à votre compte (voir le guide « Régler son téléphone »). Le carnet est le
+Oui, si votre téléphone est relié à votre compte (voir [« Ajouter son compte sur un téléphone »](https://git.convergent.tn/fbennasr/SnappyMail-workspace/src/branch/main/autoconfig/docs/GUIDE.md#ajouter-son-compte-sur-un-téléphone)). Le carnet est le
 même partout.
 
 **Un contact ne veut pas se modifier.**
