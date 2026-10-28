@@ -8,6 +8,8 @@ le webmail se retrouve sur votre téléphone s'il est relié à votre compte.
 
 ## Ouvrir le carnet d'adresses
 
+**À quoi ça sert :** retrouver toutes les personnes avec qui vous correspondez.
+
 1. Dans la barre des applications, cliquez sur **Contacts**.
 
 **Résultat :** la liste de vos contacts s'affiche, rangée par lettre. Le chiffre sous chaque lettre dit
@@ -24,6 +26,8 @@ combien de contacts commencent par elle ; **Tous** les montre tous.
 
 ## Consulter et modifier une fiche
 
+**À quoi ça sert :** lire ou corriger le téléphone, l'adresse ou les autres informations d'un contact.
+
 1. Cliquez sur un contact dans la liste.
 2. Sa fiche s'ouvre à droite, avec les onglets **Contact**, **professionnel** et **Chiffrement**.
 3. Modifiez ce que vous voulez : prénom, nom, adresse électronique… **Ajouter** propose d'autres champs :
@@ -36,6 +40,8 @@ combien de contacts commencent par elle ; **Tous** les montre tous.
 
 ## Ajouter un contact
 
+**À quoi ça sert :** garder dans votre carnet une personne que vous ne voulez pas perdre de vue.
+
 1. Cliquez sur **Ajouter un contact**, en haut à gauche.
 2. Remplissez au moins le nom et l'adresse électronique.
 3. Cliquez sur **Créer**.
@@ -47,12 +53,16 @@ l'expéditeur aux contacts ».
 
 ## Écrire à un ou plusieurs contacts
 
+**À quoi ça sert :** écrire à plusieurs personnes du carnet sans recopier leurs adresses.
+
 1. Cochez les contacts voulus dans la liste.
 2. Cliquez sur le bouton vert de l'enveloppe.
 
 **Résultat :** un nouveau message s'ouvre, adressé aux contacts cochés.
 
 ## Supprimer un contact
+
+**À quoi ça sert :** retirer du carnet une personne dont vous n'avez plus besoin.
 
 1. Cochez le ou les contacts.
 2. Cliquez sur la corbeille.

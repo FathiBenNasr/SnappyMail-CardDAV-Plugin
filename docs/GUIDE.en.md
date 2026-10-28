@@ -8,6 +8,8 @@ shows up on your phone if the phone is linked to your account.
 
 ## Open the address book
 
+**What it is for:** find everyone you correspond with.
+
 1. In the app bar, click **Contacts**.
 
 **Result:** the list of your contacts appears, sorted by letter. The number under each letter says how many
@@ -24,6 +26,8 @@ contacts start with it; **All** shows them all.
 
 ## View and edit a contact
 
+**What it is for:** read or correct a contact's phone, address or other details.
+
 1. Click a contact in the list.
 2. Their card opens on the right, with the **Contact**, **Business** and **Crypto** tabs.
 3. Change what you need: first name, last name, email address… **Add** offers more fields: **Phone**,
@@ -36,6 +40,8 @@ contacts start with it; **All** shows them all.
 
 ## Add a contact
 
+**What it is for:** keep in your address book someone you do not want to lose track of.
+
 1. Click **Add Contact**, at the top left.
 2. Fill in at least the name and the email address.
 3. Click **Create**.
@@ -47,12 +53,16 @@ your contacts".
 
 ## Write to one or more contacts
 
+**What it is for:** write to several people of the address book without copying their addresses.
+
 1. Tick the contacts you want in the list.
 2. Click the green envelope button.
 
 **Result:** a new message opens, addressed to the ticked contacts.
 
 ## Delete a contact
+
+**What it is for:** remove from the address book someone you no longer need.
 
 1. Tick the contact or contacts.
 2. Click the bin.
