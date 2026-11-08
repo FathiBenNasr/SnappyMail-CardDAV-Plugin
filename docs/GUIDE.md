@@ -29,7 +29,7 @@ combien de contacts commencent par elle ; **Tous** les montre tous.
 **À quoi ça sert :** lire ou corriger le téléphone, l'adresse ou les autres informations d'un contact.
 
 1. Cliquez sur un contact dans la liste.
-2. Sa fiche s'ouvre à droite, avec les onglets **Contact**, **professionnel** et **Chiffrement**.
+2. Sa fiche s'ouvre à droite, avec les onglets **Contact**, **Localisations**, **professionnel** et **Chiffrement**.
 3. Modifiez ce que vous voulez : prénom, nom, adresse électronique… **Ajouter** propose d'autres champs :
    **Téléphone**, **Adresse**, **Anniversaire**, **Notes**, **URL**, **Pseudonyme**, **Étiquettes**.
 4. Cliquez sur **Enregistrer**.
@@ -58,7 +58,7 @@ Pour ajouter l'expéditeur d'un message que vous lisez, il y a plus court : voir
 1. Cochez les contacts voulus dans la liste.
 2. Cliquez sur le bouton vert de l'enveloppe.
 
-**Résultat :** un nouveau message s'ouvre, adressé aux contacts cochés.
+**Résultat :** un nouveau message s'ouvre, adressé aux contacts cochés. Sur la fiche d'un contact à plusieurs adresses, la case **Envoyer à tous les e-mails contact** les inclut toutes.
 
 ## Supprimer un contact
 

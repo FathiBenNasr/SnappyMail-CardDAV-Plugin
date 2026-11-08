@@ -29,7 +29,7 @@ contacts start with it; **All** shows them all.
 **What it is for:** read or correct a contact's phone, address or other details.
 
 1. Click a contact in the list.
-2. Their card opens on the right, with the **Contact**, **Business** and **Crypto** tabs.
+2. Their card opens on the right, with the **Contact**, **Locations**, **Business** and **Crypto** tabs.
 3. Change what you need: first name, last name, email address… **Add** offers more fields: **Phone**,
    **Address**, **Birthday**, **Notes**, **URL**, **Nickname**, **Tags**.
 4. Click **Save**.
@@ -58,7 +58,7 @@ To add the sender of a message you are reading, there is a quicker way: see
 1. Tick the contacts you want in the list.
 2. Click the green envelope button.
 
-**Result:** a new message opens, addressed to the ticked contacts.
+**Result:** a new message opens, addressed to the ticked contacts. On the card of a contact with several addresses, the **Send to all contact emails** box includes them all.
 
 ## Delete a contact
 
