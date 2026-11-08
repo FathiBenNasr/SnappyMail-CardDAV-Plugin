@@ -64,6 +64,8 @@ To add the sender of a message you are reading, there is a quicker way: see
 
 **What it is for:** remove from the address book someone you no longer need.
 
+**Warning:** Deletion is immediate, with no confirmation, and also applies on your other devices.
+
 1. Tick the contact or contacts.
 2. Click the bin.
 

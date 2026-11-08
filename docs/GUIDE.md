@@ -64,6 +64,8 @@ Pour ajouter l'expéditeur d'un message que vous lisez, il y a plus court : voir
 
 **À quoi ça sert :** retirer du carnet une personne dont vous n'avez plus besoin.
 
+**Attention :** La suppression est immédiate, sans demande de confirmation, et vaut aussi sur vos autres appareils.
+
 1. Cochez le ou les contacts.
 2. Cliquez sur la corbeille.
 
