@@ -6,6 +6,7 @@ réutilisé. Reconstitué le 24 octobre 2026 depuis l'historique Git.
 
 ## [Non publié]
 
+- Guide : dernières corrections après les avis des relecteurs externes.
 - Guide : affirmations fausses ou dangereuses corrigées après la lecture adversariale.
 
 - Guide relu pour le manuel : corrections de la relecture de fond.
